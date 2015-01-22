@@ -1,7 +1,8 @@
-kfc(1) -- generic producer and consumer for Apache Kafka
-=======================================================
+kfc(1) -- kafka client
+======================
 
 Copyright (c) 2015, François Saint-Jacques
+
 Copyright (c) 2014, Magnus Edenhill
 
 https://github.com/fsaintjacques/kfc
@@ -14,11 +15,10 @@ https://github.com/edenhill/kafkacat
 think of it as a netcat for Kafka.
 
 In `producer` mode, `kfc` reads messages from standard input, delimited with a
-configurable delimiter (`-D`, defaults to newline), and produces them to the
-provided Kafka cluster (`-b`), topic (`-t`) and partition (`-p`).
+configurable character, and produces them to the provided topic.
 
-In `consumer` mode, `kfc` reads messages from a topic and partition and
-prints them to standard output using the configured message delimiter.
+In `consumer` mode, `kfc` reads messages from a topic and
+prints them to standard output.
 
 `kfc` also features a metadata list command to display the current
 state of the Kafka cluster and its topics and partitions.
@@ -33,7 +33,7 @@ REQUIREMENTS
 BUILD
 -----
 
-    ./configure <usual-configure-options>
+    ./configure
     make
     sudo make install
 

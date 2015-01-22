@@ -1,5 +1,5 @@
-kfc(1) -- generic producer and consumer for Apache Kafka
-=======================================================
+kfc(1) -- kafka client
+======================
 
 SYNOPSIS
 --------
@@ -15,7 +15,7 @@ kfc consumer [--brokers=<brks>] [--partition=<part>] [--offset=<off>]
              [-e | --exit] [-O | --print-offset] [-u | --unbuffered]
              [-q | --quiet] [-v | --verbose] <topic>
 
-kfc metadata [--brokers=<brks>] [--partition=<part>][-q | --quiet]
+kfc metadata [--brokers=<brks>] [--partition=<part>] [-q | --quiet]
              [-v | --verbose] [<topic>]
 
 kfc --help
@@ -52,12 +52,12 @@ OPTIONS
 ### Generic options
 
 * `-b <brokers>, --brokers=<brokers>`
-  Comma separated list of broker(s) to bootstrap of the form
-  "host[:port][,...]", e.g. "host1:9292,host2:9293" [default: localhost].
+  Comma separated list of broker(s) to bootstrap the connection, e.g.
+  "host1:9292,host2:9293" [default: localhost].
 
 * `-p <partition>, --partition=<partition>`
-  Send messages to a specific partition. If -1 is provided, a partition will
-  be randomly uniformly selected for each message.
+  Send messages to a specific partition. If -1 is provided, a random
+  partition is attributed to each message.
 
 * `-v, --verbose`
   Augment verbosity level.
@@ -76,7 +76,6 @@ OPTIONS
 * `-d <delim>, --delimiter=<delim>`
   Message delimiter character: a-z.. | \\r | \\n | \\t | \\xNN [default: \\n].
 
-
 * `-k <delim>, --key-delimiter=<delim>`
   Key delimiter character: a-z.. | \\r | \\n | \\t | \\xNN.
 
@@ -89,12 +88,11 @@ OPTIONS
 * `-T, --tee`
   Output queued messages to stdout, acting like tee. A message is relayed to
   stdout once it hits librdkafka's internal queue, it can still fail to reach
-  the producer. See `-E` for more information on failed messages.
+  the broker. See `-E` for more information on failed messages.
 
 * `-E <file>, --error-file=<file>`
-  Messages that couldn't be sent are append to `<file>`, formatted according
-  to delimiter and key delimiter (if provided). There is not guarantee
-  on the ordering of the messages [default: stderr].
+  Messages that couldn't be sent are written to `<file>`. There is no guarantee
+  on the ordering of messages [default: stderr].
 
 ### Consumer options
 
@@ -130,7 +128,7 @@ EXAMPLES
     $ echo "test message" | kfc producer test
 ```
 
-* Consuming last message
+* Consuming the last message and exiting immediately
 
 ```
     $ kfc consumer -e -o -1 test
