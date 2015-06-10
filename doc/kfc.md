@@ -8,15 +8,15 @@ SYNOPSIS
 kfc producer [--brokers=<brks>] [--partition=<part>] [--compression=<comp>]
              [--delimiter=<delim>] [--key-delimiter=<delim>] [--count=<cnt>]
              [--error-file=<file>] [-T | --tee] [-q | --quiet]
-             [-v | --verbose] <topic> [<file>...]
+             [ (-X <conf>)... ] [-v | --verbose] <topic> [<file>...]
 
 kfc consumer [--brokers=<brks>] [--partition=<part>] [--offset=<off>]
              [--delimiter=<delim>] [--key-delimiter=<delim>] [--count=<cnt>]
              [-e | --exit] [-O | --print-offset] [-u | --unbuffered]
-             [-q | --quiet] [-v | --verbose] <topic>
+             [ (-X <conf>)... ] [-q | --quiet] [-v | --verbose] <topic>
 
 kfc metadata [--brokers=<brks>] [--partition=<part>] [-q | --quiet]
-             [-v | --verbose] [<topic>]
+             [ (-X <conf>)... ] [-v | --verbose] [<topic>]
 
 kfc --help
 
@@ -58,6 +58,11 @@ OPTIONS
 * `-p <partition>, --partition=<partition>`
   Send messages to a specific partition. If -1 is provided, a random
   partition is attributed to each message.
+
+* `-X <conf>`
+  Relay <configuration> to librdkafka configuration system. This option
+  hides a lot of functionnality. For more information, the user should
+  read the matching `CONFIGURATION.md` of librdkafka.
 
 * `-v, --verbose`
   Augment verbosity level.

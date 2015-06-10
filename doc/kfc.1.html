@@ -77,15 +77,15 @@
 <pre><code>kfc producer [--brokers=&lt;brks>] [--partition=&lt;part>] [--compression=&lt;comp>]
              [--delimiter=&lt;delim>] [--key-delimiter=&lt;delim>] [--count=&lt;cnt>]
              [--error-file=&lt;file>] [-T | --tee] [-q | --quiet]
-             [-v | --verbose] &lt;topic> [&lt;file>...]
+             [ (-X &lt;conf>)... ] [-v | --verbose] &lt;topic> [&lt;file>...]
 
 kfc consumer [--brokers=&lt;brks>] [--partition=&lt;part>] [--offset=&lt;off>]
              [--delimiter=&lt;delim>] [--key-delimiter=&lt;delim>] [--count=&lt;cnt>]
              [-e | --exit] [-O | --print-offset] [-u | --unbuffered]
-             [-q | --quiet] [-v | --verbose] &lt;topic>
+             [ (-X &lt;conf>)... ] [-q | --quiet] [-v | --verbose] &lt;topic>
 
 kfc metadata [--brokers=&lt;brks>] [--partition=&lt;part>] [-q | --quiet]
-             [-v | --verbose] [&lt;topic>]
+             [ (-X &lt;conf>)... ] [-v | --verbose] [&lt;topic>]
 
 kfc --help
 
@@ -125,6 +125,10 @@ Comma separated list of broker(s) to bootstrap the connection, e.g.
 <li><p><code>-p &lt;partition>, --partition=&lt;partition></code>
 Send messages to a specific partition. If -1 is provided, a random
 partition is attributed to each message.</p></li>
+<li><p><code>-X &lt;conf></code>
+Relay <var>configuration</var> to librdkafka configuration system. This option
+hides a lot of functionnality. For more information, the user should
+read the matching <code>CONFIGURATION.md</code> of librdkafka.</p></li>
 <li><p><code>-v, --verbose</code>
 Augment verbosity level.</p></li>
 <li><p><code>-q, --quiet</code>
