@@ -59,7 +59,7 @@ static void consumer_argparse (int argc, char **argv) {
   int option_index = 0;
 
   while ((opt = getopt_long(argc, argv,
-                            "b:p:d:k:o:c:euX:vq",
+                            "b:p:d:k:o:c:eOuX:vq",
                             consumer_long_options,
                             &option_index)) != -1) {
     switch (opt) {
