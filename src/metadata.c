@@ -50,7 +50,7 @@ static void metadata_argparse (int argc, char **argv) {
   int option_index = 0;
 
   while ((opt = getopt_long(argc, argv,
-                            "b:p:vqX",
+                            "b:p:vqX:",
                             metadata_long_options,
                             &option_index)) != -1) {
     switch (opt) {
