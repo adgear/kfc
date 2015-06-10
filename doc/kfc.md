@@ -60,7 +60,7 @@ OPTIONS
   partition is attributed to each message.
 
 * `-X <conf>`
-  Relay <configuration> to librdkafka configuration system. This option
+  Relay `<conf>` to librdkafka configuration system. This option
   hides a lot of functionnality. For more information, the user should
   read the matching `CONFIGURATION.md` of librdkafka.
 
