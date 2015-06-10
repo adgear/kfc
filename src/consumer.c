@@ -196,6 +196,9 @@ static void consume_cb (rd_kafka_message_t *rkmessage, void *opaque) {
     if (rkmessage->err == RD_KAFKA_RESP_ERR__PARTITION_EOF) {
       if (conf.exit_eof) {
         if (!part_eof[rkmessage->partition]) {
+          /* Stop consuming this partition */
+          rd_kafka_consume_stop(rkmessage->rkt,
+                                rkmessage->partition);
           part_eof[rkmessage->partition] = 1;
           part_eof_cnt++;
 
@@ -328,6 +331,11 @@ int consumer_main(int argc, char **argv) {
     if (conf.partition != RD_KAFKA_PARTITION_UA &&
         conf.partition != partition)
       continue;
+
+    /* Dont stop already stopped partitions */
+    if (!part_eof || !part_eof[partition])
+      rd_kafka_consume_stop(conf.rkt, partition);
+
 
     rd_kafka_consume_stop(conf.rkt, partition);
   }
