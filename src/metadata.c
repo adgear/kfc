@@ -131,7 +131,7 @@ static void metadata_argparse (int argc, char **argv) {
     conf.topic = argv[optind++];
 }
 
-static void metadata_print (const struct rd_kafka_metadata *metadata) {
+static void metadata_print (const rd_kafka_metadata_t *metadata) {
   printf("{\n");
 
   /* Iterate brokers */
@@ -147,7 +147,7 @@ static void metadata_print (const struct rd_kafka_metadata *metadata) {
   /* Iterate topics */
   printf("  \"topics\": [\n");
   for (int i = 0 ; i < metadata->topic_cnt ; i++) {
-    const struct rd_kafka_metadata_topic *t = &metadata->topics[i];
+    const rd_kafka_metadata_topic_t *t = &metadata->topics[i];
     if (t->err) {
       fprintf(stderr, " %s", rd_kafka_err2str(t->err));
       continue;
@@ -159,7 +159,7 @@ static void metadata_print (const struct rd_kafka_metadata *metadata) {
 
     /* Iterate topic's partitions */
     for (int j = 0 ; j < t->partition_cnt ; j++) {
-      const struct rd_kafka_metadata_partition *p = &t->partitions[j];
+      const rd_kafka_metadata_partition_t *p = &t->partitions[j];
       if (p->err)
         fprintf(stderr, "%s\n", rd_kafka_err2str(p->err));
 
@@ -192,7 +192,7 @@ static void metadata_print (const struct rd_kafka_metadata *metadata) {
 
 int metadata_main(int argc, char **argv) {
   rd_kafka_resp_err_t err;
-  const struct rd_kafka_metadata *metadata;
+  const rd_kafka_metadata_t *metadata;
 
   /* Parse command line arguments */
   metadata_argparse(argc, argv);

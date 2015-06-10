@@ -241,7 +241,7 @@ static void consume_cb (rd_kafka_message_t *rkmessage, void *opaque) {
 }
 
 int consumer_main(int argc, char **argv) {
-  const struct rd_kafka_metadata *metadata;
+  const rd_kafka_metadata_t *metadata;
   rd_kafka_resp_err_t err;
   rd_kafka_queue_t *rkqu;
   int i;
