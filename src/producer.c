@@ -224,6 +224,13 @@ static void produce_cb (rd_kafka_t *rk,
 
     if (failed)
       FATAL("Couldn't write to error log");
+
+    switch(msg->err) {
+      case RD_KAFKA_RESP_ERR__UNKNOWN_PARTITION: FATAL("Unknown partition"); break;
+      case RD_KAFKA_RESP_ERR__UNKNOWN_TOPIC:     FATAL("Unknown topic"); break;
+      case RD_KAFKA_RESP_ERR_MSG_SIZE_TOO_LARGE: FATAL("Message size too large"); break;
+      default: ;
+    }
   }
 
 }
@@ -232,27 +239,34 @@ static void produce_cb (rd_kafka_t *rk,
  * Produces a single message, retries on queue congestion, and
  * exits hard on error.
  */
-static void produce_message (void *buf, size_t len,
-                             const void *key, size_t key_len, int msgflags) {
+static int produce_message (void *buf, size_t len,
+                            const void *key, size_t key_len, int msgflags) {
   /* Produce message: keep trying until it succeeds. */
+  int ret = 0;
   do {
     rd_kafka_resp_err_t err;
 
-    if (!conf.run)
+    if (!conf.run) {
       INFO(LOG_ERR,
            "Program terminated while producing message of %zd bytes", len);
+      ret = -1;
+      break;
+    }
 
     if (rd_kafka_produce(conf.rkt, conf.partition, msgflags,
-                         buf, len, key, key_len, NULL) != -1) {
+                         buf, len, key, key_len, NULL) == 0) {
       stats.tx++;
       break;
     }
 
     err = rd_kafka_errno2err(errno);
 
-    if (err != RD_KAFKA_RESP_ERR__QUEUE_FULL)
+    if (err != RD_KAFKA_RESP_ERR__QUEUE_FULL) {
       INFO(LOG_ERR, "Failed to produce message (%zd bytes): %s",
             len, rd_kafka_err2str(err));
+      ret = -1;
+      break;
+    }
 
     stats.tx_err_q++;
 
@@ -262,15 +276,18 @@ static void produce_message (void *buf, size_t len,
      */
     usleep(5);
   } while (1);
+
+  return ret;
 }
 
 /**
  * Produces a single file exits hard on error.
  */
-static void produce_file (FILE *fp) {
+static int produce_file (FILE *fp) {
   char   *sbuf  = NULL;
   size_t  size = 0;
   ssize_t len;
+  int ret = 0;
 
   /* Read messages from fp, delimited by conf.delim */
   while (conf.run &&
@@ -318,10 +335,13 @@ static void produce_file (FILE *fp) {
       }
 
       /* Produce message */
-      produce_message(buf, len, key, key_len, msgflags);
+      if (produce_message(buf, len, key, key_len, msgflags) == -1) {
+        ret = -1;
+        break;
+      }
 
       if (conf.flags & CONF_F_TEE &&
-          fwrite(buf, orig_len, 1, stdout) != 1)
+          fwrite(sbuf, orig_len, 1, stdout) != 1)
         FATAL("Tee write error for message of %zd bytes: %s",
               orig_len, strerror(errno));
 
@@ -335,16 +355,18 @@ static void produce_file (FILE *fp) {
       /* Enforce -c <cnt> */
       if (stats.tx == conf.msg_cnt)
         conf.run = 0;
-    }
+  }
 
-    if (conf.run) {
-      if (!feof(fp))
-        FATAL("Unable to read message: %s",
-              strerror(errno));
-    }
+  if (conf.run) {
+    if (!feof(fp))
+      FATAL("Unable to read message: %s",
+          strerror(errno));
+  }
 
   if (sbuf)
     free(sbuf);
+
+  return ret;
 }
 
 void producer_main (int argc, char **argv) {
@@ -362,7 +384,8 @@ void producer_main (int argc, char **argv) {
     FATAL("Could not create loop thread");
 
   for (size_t i = 0; i < conf.n_inputs; i++)
-    produce_file(conf.inputs[i]);
+    if(produce_file(conf.inputs[i]))
+      exit(1);
 
   /* successfully completed */
   conf.run = 0;

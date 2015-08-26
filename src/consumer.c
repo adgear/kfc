@@ -59,7 +59,7 @@ static void consumer_argparse (int argc, char **argv) {
   int option_index = 0;
 
   while ((opt = getopt_long(argc, argv,
-                            "b:p:d:k:o:c:euX:vq",
+                            "b:p:d:k:o:c:eOuX:vq",
                             consumer_long_options,
                             &option_index)) != -1) {
     switch (opt) {
@@ -196,6 +196,9 @@ static void consume_cb (rd_kafka_message_t *rkmessage, void *opaque) {
     if (rkmessage->err == RD_KAFKA_RESP_ERR__PARTITION_EOF) {
       if (conf.exit_eof) {
         if (!part_eof[rkmessage->partition]) {
+          /* Stop consuming this partition */
+          rd_kafka_consume_stop(rkmessage->rkt,
+                                rkmessage->partition);
           part_eof[rkmessage->partition] = 1;
           part_eof_cnt++;
 
@@ -229,7 +232,8 @@ static void consume_cb (rd_kafka_message_t *rkmessage, void *opaque) {
       (int)rkmessage->key_len, (const char *)rkmessage->key,
       conf.key_delim);
 
-  if (fwrite(rkmessage->payload, rkmessage->len, 1, fp) != 1 ||
+  if ((rkmessage->len > 0 &&
+       fwrite(rkmessage->payload, rkmessage->len, 1, fp) != 1) ||
       fwrite(&conf.delim, 1, 1, fp) != 1)
     FATAL("Write error for message "
     "of %zd bytes at offset %"PRId64"): %s",
@@ -240,7 +244,7 @@ static void consume_cb (rd_kafka_message_t *rkmessage, void *opaque) {
 }
 
 int consumer_main(int argc, char **argv) {
-  const struct rd_kafka_metadata *metadata;
+  const rd_kafka_metadata_t *metadata;
   rd_kafka_resp_err_t err;
   rd_kafka_queue_t *rkqu;
   int i;
@@ -327,6 +331,11 @@ int consumer_main(int argc, char **argv) {
     if (conf.partition != RD_KAFKA_PARTITION_UA &&
         conf.partition != partition)
       continue;
+
+    /* Dont stop already stopped partitions */
+    if (!part_eof || !part_eof[partition])
+      rd_kafka_consume_stop(conf.rkt, partition);
+
 
     rd_kafka_consume_stop(conf.rkt, partition);
   }

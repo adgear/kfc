@@ -48,7 +48,7 @@ rm -rf %{buildroot}
 %defattr(644,root,root)
 %doc README.md
 %doc LICENSE
-%doc doc/kfc.1
+%doc %{_mandir}/man1/kfc.1.gz
 
 %changelog
 * Thu Jan 15 2015 François Saint-Jacques <fsaintjacques@gmail.com> 0.11.0-0
