@@ -107,9 +107,9 @@ void __attribute__((noreturn)) usage (const char *argv0, int exitcode,
 
   printf("Usage:\n"
          "\n"
-         "kfc producer <topic> [<file>...]\n"
-         "kfc consumer <topic>\n"
-         "kfc metadata [<topic>]\n"
+         "kfc producer [options]  <topic> [<file>...]\n"
+         "kfc consumer [options]  <topic>\n"
+         "kfc metadata [options] [<topic>]\n"
          "kfc --help\n"
          "kfc --version\n"
          "\n"
