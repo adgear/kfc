@@ -173,7 +173,7 @@ void kfc_rdkafka_init(rd_kafka_type_t type) {
              errstr, sizeof(errstr))))
     FATAL("Failed to create rd_kafka struct: %s", errstr);
 
-  rd_kafka_set_logger(conf.rk, rd_kafka_log_print);
+  rd_kafka_conf_set_log_cb(conf.rk_conf, rd_kafka_log_print);
   if (conf.debug)
     rd_kafka_set_log_level(conf.rk, LOG_DEBUG);
   else if (conf.verbosity == 0)
